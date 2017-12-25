@@ -29,19 +29,19 @@
     (while (> (count code) strindex)
       (do
         (case (char-at code strindex)
-          \. (println &(str (Char.from-int @(nth tape idx))))
+          \. (print &(str (Char.from-int @(nth tape idx))))
           \, (aset! tape idx (Int.from-string &(get-line)))
           \> (set! &idx (Int.inc idx))
           \< (set! &idx (Int.dec idx))
           \+ (aset! tape idx (Int.inc @(nth tape idx)))
           \- (aset! tape idx (Int.dec @(nth tape idx)))
-          \[ (when (/= 0 @(nth tape idx))
-               (set! &strindex (search-forward code strindex)))
+          \[ (when (= 0 @(nth tape idx))
+               (set! &strindex (search-forward code (Int.inc strindex))))
           \] (when (/= 0 @(nth tape idx))
-               (set! &idx (search-backward code strindex)))
+               (set! &strindex (search-backward code (Int.dec strindex))))
           ())
         (set! &strindex (Int.inc strindex))))))
 
 (defn main []
   (let [zero 0]
-  (evaluate 0 &(replicate 30 &zero) &(read-file "t.bf"))))
+  (evaluate 0 &(replicate 30000 &zero) &(read-file "examples/hello_world.bf"))))
