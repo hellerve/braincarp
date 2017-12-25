@@ -1,0 +1,47 @@
+(use-all Array IO)
+
+(add-cflag "-fsanitize=address")
+
+(defn search-forward [code idx]
+  (let-do [depth 1]
+    (while (> depth 0)
+      (do
+        (case (char-at code idx)
+          \[ (set! &depth (Int.inc depth))
+          \] (set! &depth (Int.dec depth))
+          ())
+        (set! &idx (Int.inc idx))))
+    idx))
+
+(defn search-backward [code idx]
+  (let-do [depth 1]
+    (while (> depth 0)
+      (do
+        (case (char-at code idx)
+          \[ (set! &depth (Int.dec depth))
+          \] (set! &depth (Int.inc depth))
+          ())
+        (set! &idx (Int.dec idx))))
+    idx))
+
+(defn evaluate [idx tape code]
+  (let [strindex 0]
+    (while (> (count code) strindex)
+      (do
+        (case (char-at code strindex)
+          \. (println &(str (Char.from-int @(nth tape idx))))
+          \, (aset! tape idx (Int.from-string &(get-line)))
+          \> (set! &idx (Int.inc idx))
+          \< (set! &idx (Int.dec idx))
+          \+ (aset! tape idx (Int.inc @(nth tape idx)))
+          \- (aset! tape idx (Int.dec @(nth tape idx)))
+          \[ (when (/= 0 @(nth tape idx))
+               (set! &strindex (search-forward code strindex)))
+          \] (when (/= 0 @(nth tape idx))
+               (set! &idx (search-backward code strindex)))
+          ())
+        (set! &strindex (Int.inc strindex))))))
+
+(defn main []
+  (let [zero 0]
+  (evaluate 0 &(replicate 30 &zero) &(read-file "t.bf"))))
