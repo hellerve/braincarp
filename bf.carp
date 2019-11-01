@@ -7,10 +7,10 @@
     (while (> depth 0)
       (do
         (case (char-at code idx)
-          \[ (set! &depth (Int.inc depth))
-          \] (set! &depth (Int.dec depth))
+          \[ (set! depth (Int.inc depth))
+          \] (set! depth (Int.dec depth))
           ())
-        (set! &idx (Int.inc idx))))
+        (set! idx (Int.inc idx))))
     idx))
 
 (defn search-backward [code idx]
@@ -18,29 +18,29 @@
     (while (> depth 0)
       (do
         (case (char-at code idx)
-          \[ (set! &depth (Int.dec depth))
-          \] (set! &depth (Int.inc depth))
+          \[ (set! depth (Int.dec depth))
+          \] (set! depth (Int.inc depth))
           ())
-        (set! &idx (Int.dec idx))))
+        (set! idx (Int.dec idx))))
     idx))
 
 (defn evaluate [idx tape code]
   (let [strindex 0]
-    (while (> (count code) strindex)
+    (while (> (length code) strindex)
       (do
         (case (char-at code strindex)
-          \. (print &(str (Char.from-int @(nth tape idx))))
+          \. (print &(str (Char.from-int @(unsafe-nth tape idx))))
           \, (aset! tape idx (Int.from-string &(get-line)))
-          \> (set! &idx (Int.inc idx))
-          \< (set! &idx (Int.dec idx))
-          \+ (aset! tape idx (Int.inc @(nth tape idx)))
-          \- (aset! tape idx (Int.dec @(nth tape idx)))
-          \[ (when (= 0 @(nth tape idx))
-               (set! &strindex (search-forward code (Int.inc strindex))))
-          \] (when (/= 0 @(nth tape idx))
-               (set! &strindex (search-backward code (Int.dec strindex))))
+          \> (set! idx (Int.inc idx))
+          \< (set! idx (Int.dec idx))
+          \+ (aset! tape idx (Int.inc @(unsafe-nth tape idx)))
+          \- (aset! tape idx (Int.dec @(unsafe-nth tape idx)))
+          \[ (when (= 0 @(unsafe-nth tape idx))
+               (set! strindex (search-forward code (Int.inc strindex))))
+          \] (when (/= 0 @(unsafe-nth tape idx))
+               (set! strindex (search-backward code (Int.dec strindex))))
           ())
-        (set! &strindex (Int.inc strindex))))))
+        (set! strindex (Int.inc strindex))))))
 
 (defn main []
   (let [zero 0]
